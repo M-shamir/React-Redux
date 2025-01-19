@@ -8,7 +8,9 @@ import Signup from '../src/Pages/Signup/Signup'
 import Admin from '../src/Pages/Admin-login/Admin_login'
 import Admin_home from '../src/Pages/Admin-Home/Admin_home'
 import EditUser from '../src/Pages/UserEdit/EditUser'
-
+import EditProfile from '../src/Pages/Home/EditProfile'
+import AddUser from '../src/Pages/Admin-Home/AddUser'
+import Counter  from './Pages/counter'
 
 function App() {
 
@@ -22,8 +24,10 @@ function App() {
       <Route path='/Signup' element={<Signup/>}/>
       <Route path='/admin-login' element={<Admin/>}/>
       <Route path='/admin-home' element={<Admin_home/>}/>
+      <Route path="/admin/users/add" element={<AddUser />} />
       <Route path="/admin/users/edit/:userId" element={<EditUser />} />
-
+      <Route path="/edit-profile" element={<EditProfile />} />
+      <Route path='/counter' element={<Counter/>}/>
       </Routes>
       
     </Router>

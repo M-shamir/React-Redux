@@ -1,25 +1,22 @@
-import {useState} from 'react';
 import { MDBContainer, MDBCol, MDBRow, MDBBtn, MDBInput } from 'mdb-react-ui-kit';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 
 function App() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [profile, setProfile] = useState(null);
-  const [error, setError] = useState('');
-  const navigate = useNavigate()
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm();
+  const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setError('');
-    
-   
+  const handleSignup = async (data) => {
     const formData = new FormData();
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('password', password);
-    if (profile) formData.append('profile', profile);
+    formData.append('username', data.username);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    if (data.profile && data.profile[0]) formData.append('profile', data.profile[0]);
 
     try {
       const response = await fetch('http://127.0.0.1:8000/api/auth/signup/', {
@@ -28,21 +25,19 @@ function App() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        console.log('Signup successful', data);
-        
-      
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        
-        
+        const responseData = await response.json();
+        console.log('Signup successful', responseData);
+
+        localStorage.setItem('access_token', responseData.access_token);
+        localStorage.setItem('refresh_token', responseData.refresh_token);
+
         navigate('/');
       } else {
         const errorData = await response.json();
-        setError('Signup failed. Please try again.');
+        setError('api', { message: errorData.message || 'Signup failed. Please try again.' });
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError('api', { message: 'An error occurred. Please try again.' });
       console.error('Signup error:', err);
     }
   };
@@ -58,7 +53,7 @@ function App() {
           <img
             src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
             className="img-fluid"
-            alt="Sample image"
+            alt="Sample"
           />
         </MDBCol>
 
@@ -66,27 +61,36 @@ function App() {
           <MDBInput
             wrapperClass="mb-4"
             label="Username"
-            id="formControlUsername"
             type="text"
             size="lg"
-            onChange={(e) => setUsername(e.target.value)}
+            {...register('username', { required: 'Username is required.' })}
           />
+          {errors.username && <p className="text-danger">{errors.username.message}</p>}
+
           <MDBInput
             wrapperClass="mb-4"
             label="Email address"
-            id="formControlEmail"
             type="email"
             size="lg"
-            onChange={(e) => setEmail(e.target.value)}
+            {...register('email', {
+              required: 'Email is required.',
+              pattern: { value: /\S+@\S+\.\S+/, message: 'Invalid email address.' },
+            })}
           />
+          {errors.email && <p className="text-danger">{errors.email.message}</p>}
+
           <MDBInput
             wrapperClass="mb-4"
             label="Password"
-            id="formControlPassword"
             type="password"
             size="lg"
-            onChange={(e) => setPassword(e.target.value)}
+            {...register('password', {
+              required: 'Password is required.',
+              minLength: { value: 6, message: 'Password must be at least 6 characters.' },
+            })}
           />
+          {errors.password && <p className="text-danger">{errors.password.message}</p>}
+
           <div className="mb-4">
             <label htmlFor="formControlFile" className="form-label">
               Upload Profile Picture
@@ -95,14 +99,15 @@ function App() {
               className="form-control form-control-lg"
               id="formControlFile"
               type="file"
-              onChange={(e) => setProfile(e.target.files[0])}
+              {...register('profile')}
             />
           </div>
+          {errors.profile && <p className="text-danger">{errors.profile.message}</p>}
 
-          {error && <p className="text-danger">{error}</p>}
+          {errors.api && <p className="text-danger">{errors.api.message}</p>}
 
           <div className="text-center text-md-start mt-4 pt-2">
-            <MDBBtn className="mb-0 px-5" size="lg" onClick={handleSignup}>
+            <MDBBtn className="mb-0 px-5" size="lg" onClick={handleSubmit(handleSignup)}>
               Register
             </MDBBtn>
             <p className="small fw-bold mt-2 pt-1 mb-2">

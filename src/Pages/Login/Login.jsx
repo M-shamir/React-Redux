@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { MDBContainer, MDBCol, MDBRow, MDBBtn, MDBIcon, MDBInput } from 'mdb-react-ui-kit';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { login } from '../../authSlice';
 
 function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access');
@@ -31,8 +34,7 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         console.log('Login Successful', data);
-        localStorage.setItem('access', data.access);
-        localStorage.setItem('refresh', data.refresh);
+        dispatch(login({ access: data.access, refresh: data.refresh }));
         navigate('/');
       } else {
         const errorData = await response.json();

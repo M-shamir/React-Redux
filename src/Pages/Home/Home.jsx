@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MDBContainer, MDBRow, MDBCol, MDBBtn, MDBCard, MDBCardBody, MDBCardImage, MDBTypography } from 'mdb-react-ui-kit';
+import { logout,setUserDetails } from '../../authSlice';
+import { useDispatch,useSelector } from 'react-redux';
 
 function Home() {
   const navigate = useNavigate();
-  const [userDetails, setUserDetails] = useState(null);
+  const dispatch = useDispatch();
+  const { access, userDetails } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access');
-    if (!accessToken) {
-      console.error('Access token is missing');
+    if (!access) {
+
       navigate('/login'); 
       return;
     }
@@ -17,7 +19,7 @@ function Home() {
     fetch('http://127.0.0.1:8000/api/auth/profile/', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${access}`,
       },
     })
       .then((response) => {
@@ -28,16 +30,17 @@ function Home() {
         return response.json();
       })
       .then((data) => {
-        setUserDetails(data); 
+        if (data) {
+          dispatch(setUserDetails(data));
+        }
       })
       .catch((err) => {
         console.error('Error fetching user data:', err);
       });
-  }, [navigate]);
+  }, [access, dispatch, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
+    dispatch(logout());
     navigate('/login'); 
   };
 
@@ -81,6 +84,15 @@ function Home() {
                 <MDBBtn onClick={handleLogout} color="danger" className="px-5" style={{ fontSize: '16px', padding: '10px 30px' }}>
                   Logout
                 </MDBBtn>
+                <MDBBtn
+    onClick={() => navigate('/edit-profile')}
+    color="info"
+    className="px-5"
+    style={{ fontSize: '16px', padding: '10px 30px' }}
+>
+    Edit Profile
+</MDBBtn>
+
               </div>
             </MDBCardBody>
           </MDBCard>

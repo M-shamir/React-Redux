@@ -17,7 +17,7 @@ function EditUser() {
   const [user, setUser] = useState({
     username: '',
     email: '',
-    profile: null, // For profile image
+    profile: null, 
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ function EditUser() {
       if (response.ok) {
         setUser({
           ...data,
-          profile: null, // Keep profile field null initially
+          profile: null, 
         });
       } else {
         throw new Error(data.detail || 'Failed to fetch user details');
@@ -50,7 +50,7 @@ function EditUser() {
     }
   };
 
-  // Handle input change for text fields
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUser((prevState) => ({
@@ -59,7 +59,7 @@ function EditUser() {
     }));
   };
 
-  // Handle file upload for profile image
+  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setUser((prevState) => ({
@@ -68,7 +68,7 @@ function EditUser() {
     }));
   };
 
-  // Save user details
+  
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -78,7 +78,7 @@ function EditUser() {
     formData.append('username', user.username);
     formData.append('email', user.email);
     if (user.profile) {
-      formData.append('profile', user.profile); // Add profile image if uploaded
+      formData.append('profile', user.profile); 
     }
 
     try {
@@ -87,7 +87,7 @@ function EditUser() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: formData, // Send as FormData
+        body: formData, 
       });
 
       if (response.ok) {

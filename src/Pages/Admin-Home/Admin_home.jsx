@@ -19,6 +19,10 @@ function Admin_home() {
 
   const fetchUsers = async () => {
     const token = localStorage.getItem('access');
+    if(!token){
+      navigate('/admin-login'); 
+      return;
+    }
     try {
       const response = await fetch('http://127.0.0.1:8000/api/admin/users/', {
         method: 'GET',
@@ -84,7 +88,9 @@ function Admin_home() {
     localStorage.removeItem('access');
     navigate('/admin-login');
   };
-
+  const handleAddUser = () => {
+    navigate('/admin/users/add');
+  };
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -100,6 +106,9 @@ function Admin_home() {
       <div className="text-end mb-4">
         <MDBBtn color="danger" onClick={handleLogout}>
           Logout
+        </MDBBtn>
+        <MDBBtn color="success" onClick={handleAddUser} className="ms-2">
+          Add User
         </MDBBtn>
       </div>
 
